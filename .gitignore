@@ -1,5 +1,14 @@
+<<<<<<< HEAD
 # Object file
 *.o
 
 # Ada Library Information
 *.ali
+=======
+node_modules/
+__pycache__/
+venv/
+.env
+build/
+.data/
+>>>>>>> 7bda39a (Добавлен полный код проекта: ast бэкенд и eact фронтенд)

@@ -1,0 +1,56 @@
+services:
+  db:
+    image: postgres:15
+    container_name: ecommerce_db
+    restart: always
+    environment:
+      POSTGRES_USER: ecommerce_user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ecommerce
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ecommerce_user -d ecommerce"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: ecommerce_backend
+    restart: always
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - DATABASE_URL=postgresql://ecommerce_user:password@db:5432/ecommerce
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: ecommerce_frontend
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: ecommerce_pgadmin
+    restart: always
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
